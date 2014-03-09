@@ -22,7 +22,7 @@ public class DiscardServer {
 		EventLoopGroup bossGroup = new NioEventLoopGroup();
 		EventLoopGroup childGroup = new NioEventLoopGroup();
 
-		try{
+		try {
 			ServerBootstrap b = new ServerBootstrap();
 			b.group(bossGroup, childGroup).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<SocketChannel>() {
 				protected void initChannel(SocketChannel ch) throws Exception {
@@ -30,15 +30,15 @@ public class DiscardServer {
 				};
 			}).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
 			ChannelFuture f = b.bind(port).sync();
-			
+
 			f.channel().closeFuture().sync();
-		}finally{
+		} finally {
 			bossGroup.shutdownGracefully();
 			childGroup.shutdownGracefully();
 		}
-		
+
 	}
-	
+
 	public static void main(String[] args) throws InterruptedException {
 		new DiscardServer(8080).run();
 	}
