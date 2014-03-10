@@ -9,7 +9,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-import com.lx281.netty.handler.DiscardHanlder;
+import com.lx281.netty.handler.SimpleEchoHandler;
 
 public class DiscardServer {
 	private int port;
@@ -26,7 +26,7 @@ public class DiscardServer {
 			ServerBootstrap b = new ServerBootstrap();
 			b.group(bossGroup, childGroup).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<SocketChannel>() {
 				protected void initChannel(SocketChannel ch) throws Exception {
-					ch.pipeline().addLast(new DiscardHanlder());
+					ch.pipeline().addLast(new SimpleEchoHandler());
 				};
 			}).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
 			ChannelFuture f = b.bind(port).sync();
