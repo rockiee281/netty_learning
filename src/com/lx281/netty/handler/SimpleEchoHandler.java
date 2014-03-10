@@ -15,8 +15,7 @@ public class SimpleEchoHandler extends ChannelHandlerAdapter {
 		b.writeChar('a'); // 在msg后追加信息
 		b.writeChar('\n');
 		ctx.write(msg);
-		ctx.flush();
-		ctx.write("123");
+		// ctx write的对象必须是ByteBuf而不能是普通的Object，具体原因暂时未知
 	}
 
 	@Override
