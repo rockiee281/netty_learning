@@ -6,7 +6,6 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
-
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -18,12 +17,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	<mirror>
-		<id>nexus-osc</id>
-		<mirrorOf>*</mirrorOf>
-		<name>Nexus osc</name>
-		<url>http://maven.oschina.net/content/groups/public/</url>
-	</mirror>
 	<dependencies>
 		<dependency>
 			<groupId>io.netty</groupId>
