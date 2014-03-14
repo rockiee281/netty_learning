@@ -21,8 +21,9 @@ int main(int argc, char *argv[])
         }
         cout << "server._listen() ok on " << port << endl;
         while (server.pulse()) {
-            usleep(1000);
+            usleep(5000);
         }
+        cout << "end!" << endl;
     } while (false);
 
     return 0;

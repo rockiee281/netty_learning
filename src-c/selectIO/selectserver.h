@@ -11,6 +11,7 @@ public:
     bool _listen(uint32_t port);
     bool pulse();
     void broadcast(const std::string& data);
+    void echo(int sockfd);
 
 protected:
     /// Callback functions to be override

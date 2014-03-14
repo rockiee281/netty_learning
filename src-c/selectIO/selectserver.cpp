@@ -36,7 +36,7 @@ bool SelectServer::_listen(uint32_t port)
         cerr << "Server-bind() error lol!" << endl;
         return false;
     }
-    if(listen(m_listenerSocket, 10) == -1) {
+    if(listen(m_listenerSocket, 100) == -1) {
         cerr << "Server-listen() error lol!" << endl;
         return false;
     }
@@ -62,14 +62,19 @@ bool SelectServer::_accept()
     return true;
 }
 
+void onNewConnection(const sockaddr_in& clientAddr){
+    cout << "accept new fd " << clientAddr.sin_addr.s_addr << endl;
+}
+
 bool SelectServer::_receive(int clientFd)
 {
     uint32_t nbytes = recv(clientFd, buf, sizeof(buf), 0);
-    cout << "_receive called...nbytes is " << nbytes << " buf is " << buf << endl;
     string data(buf, nbytes);
+    //cout << "_receive called...nbytes is " << nbytes << " data is " << data << endl;
     onClientData(clientFd, data);
     if (nbytes > 0) {   /** we got some data from a client*/
         broadcast(data);
+        //echo(clientFd);
     } else {
         cout << "socket " << clientFd << " has sth wrong since nbytes == " << nbytes  << endl;
         removeClient(clientFd);
@@ -94,24 +99,43 @@ bool SelectServer::pulse()
     }
 
     /** run through the existing connections looking for data to be read*/
-    for(int i = 0; i <= m_maxFd; ++i) {
+    printf("***************** some fd readable ********************\n");
+    for(int i = 3; i <= m_maxFd; ++i) {
         if(FD_ISSET(i, &m_readFdSet)) { /** we got one... */
+            printf("fd [%d] is readable!\n", i);
             if(i == m_listenerSocket) {
-                return _accept();
+                printf("accept new fd [%d] !\n", i);
+                _accept();
+                return true;
             } else {
-                return _receive(i);
+                printf("get data from  fd [%d] !\n", i);
+                _receive(i);
             }
         }
     }
     return true;
 }
+void SelectServer::echo(int sockfd){
+    if(FD_ISSET(sockfd, &m_masterFdSet) && (sockfd != m_listenerSocket)){
+        char buffer[80];
+        sprintf(buffer, "hello, client[%d],this is sky net\n", sockfd);
+        if(send(sockfd,buffer,strlen(buffer),0) == -1){
+            cerr << "echo() failed!" << endl;
+        }
+    }
+}
 
 void SelectServer::broadcast(const string &data)
 {
+    cout << "begin to send broadcast" << endl;
     for(int i = 0; i <= m_maxFd; i++) {
         /** send to everyone except the listener and ourselves */
         if(FD_ISSET(i, &m_masterFdSet) && (i != m_listenerSocket)) {
+            cout << "send broadcast to " << i << endl;
             if(send(i, data.c_str(), data.size(), 0) == -1) {
+            //char buffer[80];
+            //sprintf(buffer, "hello, client[%d],this is sky net\n", i);
+            //if(send(i,buffer,strlen(buffer),0) == -1){
                 cerr << "send() to " << i << " error lol!" << endl;
             }
         }
